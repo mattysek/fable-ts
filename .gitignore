@@ -1,0 +1,9 @@
+.fake/
+.vs/
+obj/
+bin/
+packages/
+paket-files/
+node_modules/
+src/public/js/
+*.DotSettings.user
