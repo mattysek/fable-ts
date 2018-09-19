@@ -8,6 +8,7 @@ open Fable.Core.JsInterop
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
+open Fable.Helpers.React.ReactiveComponents
 
 //Types representing model and commands
 module Types = 
@@ -23,6 +24,8 @@ module Types =
 
 //State management
 module State =
+
+    open Types
 
     // defines the initial state and initial command (= side-effect) of the application
     let init () : Model * Cmd<Msg> =
@@ -46,27 +49,36 @@ module Counter =
     // interface Props
     type Props =
       | Name of string
-      | OnIncrement of UnitFunc
-      | OnDecrement of UnitFunc
+      | OnIncrement of Procedure
+      | OnDecrement of Procedure
 
     // function Counter({ name, onIncrement, onDecrement }: Props)
-    let inline Counter (props : Props list) : Fable.Import.React.ReactElement =
+    let inline counter (props : Props list) : Fable.Import.React.ReactElement =
         ofImport "default" "./Counter.tsx" (keyValueList CaseRules.LowerFirst props) []
 
 //View of our application
 module View =
 
+    open Types
     open Counter
 
-    let view (model : Model) (dispatch : Msg -> unit) =
-        div [] [ div [] [ str "Fable Counter" ]
-                 div [] [ button "-" (fun _ -> dispatch Decrement)
-                          button "+" (fun _ -> dispatch Increment) ]
+    let simpleButton text onClick =
+        button [ OnClick onClick ] [ str text ] 
 
-                 Counter [ Name "TS Counter"
+    let view (model : Model) (dispatch : Msg -> unit) =
+        div [] [ span [] [ str (sprintf "COUNT: %i" model.Counter) ]
+            
+                 div [] [ str "Fable Counter" ]
+                 div [] [ simpleButton "-" (fun _ -> dispatch Decrement)
+                          simpleButton "+" (fun _ -> dispatch Increment) ]
+
+                 counter [ Name "TS Counter"
                            OnIncrement (fun _ -> dispatch Increment)
                            OnDecrement (fun _ -> dispatch Decrement) ] ]
 
+
+open State
+open View
 
 #if DEBUG
 open Elmish.Debug
